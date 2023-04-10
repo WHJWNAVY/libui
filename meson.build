@@ -6,10 +6,9 @@
 project('libui', ['c', 'cpp'],
 	meson_version: '>=0.48.0',
 	default_options: [
-		'buildtype=debug',				# build debug by default
+		'buildtype=release',				# build debug by default
 		'default_library=shared',			# build shared libraries by default
 		'layout=flat',					# keep all outputs together by default
-
 		# these are forced options, but meson doesn't let me set these up separately before I call project() (TODO https://github.com/mesonbuild/meson/issues/5179)
 		'warning_level=3',				# always max warnings
 		'b_pch=false',					# we don't want precompiled headers
@@ -19,6 +18,7 @@ project('libui', ['c', 'cpp'],
 		'cpp_std=c++11',				# strict C++11
 		'cpp_eh=sc',					# shut the compiler up in some cases
 		'cpp_winlibs=',					# likewise as with c_winlibs
+		'strip=true',
 	],
 	license: 'MIT')
 
@@ -93,6 +93,10 @@ else
 	libui_project_compile_args += [
 		'-Wno-unused-parameter',
 		'-Wno-switch',
+		'-mwindows',
+		'-Wl,--subsystem,windows',
+		'-DWIN_UNICODE',
+		'-Os',
 	]
 
 	if libui_OS == 'windows'
@@ -101,6 +105,11 @@ else
 			'-static',
 			'-static-libgcc',
 			'-static-libstdc++',
+			'-mwindows',
+			'-Wl,--subsystem,windows',
+			'-liphlpapi',
+			'-lws2_32',
+			'-DWIN_UNICODE',
 		]
 	endif
 endif
